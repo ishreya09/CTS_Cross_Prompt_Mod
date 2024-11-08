@@ -114,10 +114,21 @@ def build_CTS(pos_vocab_size, maxnum, maxlen, readability_feature_count,
                                                      for pos_rep in pos_avg_hz_bilstm_feat_list])  # 2 * lstm_units for BiLSTM
 
     
+    # final_preds = []
+    # for index in range(output_dim):
+    #     non_target_rep = layers.Concatenate(axis=-2)([pos_avg_hz_lstm[:, i:i+1, :] for i in range(output_dim) if i != index])
+    #     target_rep = pos_avg_hz_lstm[:, index:index+1, :]
+    #     att_attention = layers.Attention()([target_rep, non_target_rep])
+    #     attention_concat = layers.Concatenate()([target_rep, att_attention])
+    #     attention_concat_flat = layers.Flatten()(attention_concat)
+    #     final_pred = layers.Dense(units=1, activation='sigmoid')(attention_concat_flat)
+    #     final_preds.append(final_pred)
+    
+    # Final predictions
     final_preds = []
     for index in range(output_dim):
-        non_target_rep = layers.Concatenate(axis=-2)([pos_avg_hz_lstm[:, i:i+1, :] for i in range(output_dim) if i != index])
-        target_rep = pos_avg_hz_lstm[:, index:index+1, :]
+        non_target_rep = layers.Concatenate(axis=-2)([pos_avg_hz_bilstm[:, i:i+1, :] for i in range(output_dim) if i != index])
+        target_rep = pos_avg_hz_bilstm[:, index:index+1, :]
         att_attention = layers.Attention()([target_rep, non_target_rep])
         attention_concat = layers.Concatenate()([target_rep, att_attention])
         attention_concat_flat = layers.Flatten()(attention_concat)
