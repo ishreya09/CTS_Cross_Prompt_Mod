@@ -8,8 +8,8 @@ class Configs:
     EMBEDDING_PATH = 'embeddings/glove.6B.50d.txt'
     VOCAB_SIZE = 4000
     DATA_PATH = 'data/cross_prompt_attributes/'
-    FEATURES_PATH = 'data\PCA\pca_1.csv'
-    READABILITY_PATH = 'data\PCA\readability.pickle'
+    FEATURES_PATH = 'data/PCA/pca_1.csv'
+    READABILITY_PATH = 'data/PCA/readability.pickle'
     EPOCHS = 50
     BATCH_SIZE = 10
     OUTPUT_PATH = 'outputs/'
