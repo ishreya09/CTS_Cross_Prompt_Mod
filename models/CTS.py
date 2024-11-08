@@ -97,13 +97,23 @@ def build_CTS(pos_vocab_size, maxnum, maxlen, readability_feature_count,
     linguistic_input = layers.Input((linguistic_feature_count,), name='linguistic_input')
     readability_input = layers.Input((readability_feature_count,), name='readability_input')
 
-    pos_hz_lstm_list = [layers.LSTM(lstm_units, return_sequences=True)(pos_avg_zcnn) for _ in range(output_dim)]
-    pos_avg_hz_lstm_list = [Attention()(pos_hz_lstm) for pos_hz_lstm in pos_hz_lstm_list]
-    pos_avg_hz_lstm_feat_list = [layers.Concatenate()([pos_rep, linguistic_input, readability_input])
-                                 for pos_rep in pos_avg_hz_lstm_list]
-    pos_avg_hz_lstm = layers.Concatenate(axis=-2)([layers.Reshape((1, lstm_units + linguistic_feature_count + readability_feature_count))(pos_rep)
-                                                   for pos_rep in pos_avg_hz_lstm_feat_list])
+    # pos_hz_lstm_list = [layers.LSTM(lstm_units, return_sequences=True)(pos_avg_zcnn) for _ in range(output_dim)]
+    # pos_avg_hz_lstm_list = [Attention()(pos_hz_lstm) for pos_hz_lstm in pos_hz_lstm_list]
+    # pos_avg_hz_lstm_feat_list = [layers.Concatenate()([pos_rep, linguistic_input, readability_input])
+    #                              for pos_rep in pos_avg_hz_lstm_list]
+    # pos_avg_hz_lstm = layers.Concatenate(axis=-2)([layers.Reshape((1, lstm_units + linguistic_feature_count + readability_feature_count))(pos_rep)
+    #                                                for pos_rep in pos_avg_hz_lstm_feat_list])
 
+    
+    # Use Bidirectional LSTM
+    pos_hz_bilstm_list = [layers.Bidirectional(layers.LSTM(lstm_units, return_sequences=True))(pos_avg_zcnn) for _ in range(output_dim)]
+    pos_avg_hz_bilstm_list = [Attention()(pos_hz_bilstm) for pos_hz_bilstm in pos_hz_bilstm_list]
+    pos_avg_hz_bilstm_feat_list = [layers.Concatenate()([pos_rep, linguistic_input, readability_input])
+                                   for pos_rep in pos_avg_hz_bilstm_list]
+    pos_avg_hz_bilstm = layers.Concatenate(axis=-2)([layers.Reshape((1, lstm_units * 2 + linguistic_feature_count + readability_feature_count))(pos_rep)
+                                                     for pos_rep in pos_avg_hz_bilstm_feat_list])  # 2 * lstm_units for BiLSTM
+
+    
     final_preds = []
     for index in range(output_dim):
         non_target_rep = layers.Concatenate(axis=-2)([pos_avg_hz_lstm[:, i:i+1, :] for i in range(output_dim) if i != index])
